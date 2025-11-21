@@ -2,13 +2,16 @@ from maix import camera, display, image
 
 class Camera:
     def __init__(self, width=160, height=120):
-        self.cam = camera.Camera(width, height)
         self.width = width
         self.height = height
+        self.cam = camera.Camera(width, height) #,image.Format.FMT_GRAYSCALE
+        self.cam.luma(43)
+        self.cam.constrast(50)
+        self.cam.saturation(50)
         self.dis = display.Display()
-        ####巡线####
+        ####巡线####   #-30, 75, -30, 35, -30, 30
         self.Rel_Color_Threshold = [[5, 35, -30, 35, -30, 30]]   # 外面黑线
-        self.Binar_Color_Threshold = [[0, 15, -5, 5, -5, 5]]     # 二值化后黑线阈值
+        self.Binar_Color_Threshold = [[0, 15, -5, 5, -5, 5]]       # 二值化后黑线阈值0, 15, -5, 5, -5, 5
         # x,y,w,h
         self.ROIS = [
             # (0, int(self.height / 6 * 0), self.width, int(self.height / 6)),
@@ -17,6 +20,10 @@ class Camera:
             (0, int(self.height / 6 * 3), self.width, int(self.height / 6)),
             (0, int(self.height / 6 * 4), self.width, int(self.height / 6)),
             (0, int(self.height / 6 * 5), self.width, int(self.height / 6))
+            # (0, 16, 160, 26),                     # 中
+            # (0, 42, 160, 26),                     # 下
+            # (0, 68, 160, 26),                     # 下
+            # (0, 94, 160, 26),                     # 下
         ]
         self.line_rho = 0 # None
         self.history_len = 5                                     # 融合最近5帧
@@ -30,6 +37,7 @@ class Camera:
                         (140,80,15,15)
                        ]
         self.flag  = [0,0,0,0]
+
 
     def process_blob_coordinates(self,accepted_blobs, max_blob_pixels):
         # 处理色块坐标：对超过像素阈值的色块进行坐标替换
@@ -61,7 +69,7 @@ class Camera:
         accepted_blobs = []  # 最终被接受的色块（从下到上）
         max_dx = 30  # 可调：允许的最大水平偏移（像素）
         min_width = 2  # 宽度小于此值的黑线将被过滤掉
-        max_blob_pixels = 500  # 最大像素阈值，像素数大于此值的 blob 会被过滤（可调）
+        max_blob_pixels = 700  # 最大像素阈值，像素数大于此值的 blob 会被过滤（可调）
         for r in reversed(self.ROIS):  # 从下往上
             blobs = img.find_blobs(self.Binar_Color_Threshold, roi=r[0:4], merge=True, pixels_threshold=100)  # 像素阈值可调
             # 先过滤宽度过小，再过滤像素过大的色块
@@ -138,8 +146,6 @@ class Camera:
         # 平滑处理（取平均值）
         self.line_rho = int(sum(self.rho_history) / len(self.rho_history))
         # print(line_rho)
-        img.draw_string(120, 4, str(self.line_rho), image.COLOR_WHITE)
-
         img.draw_string(120, 4, str(self.line_rho), image.COLOR_WHITE)
 
         return accepted_blobs
