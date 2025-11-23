@@ -12,6 +12,7 @@ class TouchScreen:
         self.close_btn_pos = [0, 6 + self.size1.height(), 6 + self.size2.width(), 6 + self.size2.height()]
         self.open_btn_disp_pos = None
         self.close_btn_disp_pos = None
+        self.turn_figure = 0
         # 1=打开摄像头, 0=关闭
         self.flag = 1
         #
@@ -95,7 +96,7 @@ class TouchScreen:
         x, y, pressed = self.ts.read()
         if pressed:
             if self.is_in_button(x, y, self.open_btn_disp_pos):       self.flag = 1  
-            if self.is_in_button(x, y, self.close_btn_disp_pos):      self.flag = 0  
+            if self.is_in_button(x, y, self.close_btn_disp_pos):      self.flag = 0  ;self.turn_figure = 0
             # if self.is_in_button(x, y, self.luma_add_btn_disp_pos):       self.set_luma +=1
             # if self.is_in_button(x, y, self.luma_sub_btn_disp_pos):       self.set_luma -=1
             # if self.is_in_button(x, y, self.con_add_btn_disp_pos):       self.set_con +=1
@@ -103,5 +104,5 @@ class TouchScreen:
             # if self.is_in_button(x, y, self.sat_add_btn_disp_pos):       self.set_sat +=1
             # if self.is_in_button(x, y, self.sat_sub_btn_disp_pos):       self.set_sat -=1
 
-        if self.flag:
-            dis.show(img)
+        # if self.flag:
+        dis.show(img)
